@@ -23,11 +23,7 @@ public class PacienteService {
         return repository.save(paciente);
     }
 
-    public void deletar(String id) {
+    public void deletar(Long id) {
         repository.deleteById(id);
-    }
-
-    public Paciente buscarPorId(String id) {
-        return repository.findById(id).orElse(null);
     }
 }

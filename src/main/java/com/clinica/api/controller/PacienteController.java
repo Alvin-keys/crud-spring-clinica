@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/pacientes")
-@CrossOrigin(origins = "*") // libera Angular
 public class PacienteController {
 
     private final PacienteService service;
@@ -27,19 +26,8 @@ public class PacienteController {
         return service.salvar(paciente);
     }
 
-    @GetMapping("/{id}")
-    public Paciente buscarPorId(@PathVariable String id) {
-        return service.buscarPorId(id);
-    }
-
     @DeleteMapping("/{id}")
-    public void deletar(@PathVariable String id) {
+    public void deletar(@PathVariable Long id) {
         service.deletar(id);
-    }
-
-    @PutMapping("/{id}")
-    public Paciente atualizar(@PathVariable String id, @RequestBody Paciente paciente) {
-        paciente.setId(id);
-        return service.salvar(paciente);
     }
 }
