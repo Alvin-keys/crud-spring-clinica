@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -19,7 +20,15 @@ public class Paciente {
     private String nome;
     private String email;
     private String telefone;
+    private LocalDate dataPrimeiraConsulta;
 
+    private Integer idade;
+    private String queixaPrincipal;
+    private String composicaoFamiliar;
+    private String rotina;
+    private String contatoEmergencia;
+    private String diasAtendimento;
+    private String horarioAtendimento;
 
     @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL)
     @JsonIgnore
