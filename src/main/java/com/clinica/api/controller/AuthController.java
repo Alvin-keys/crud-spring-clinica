@@ -1,8 +1,8 @@
 package com.clinica.api.controller;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.clinica.api.dto.LoginRequest;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+import com.clinica.api.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,38 +16,37 @@ public class AuthController {
     @Value("${app.security.usuario}")
     private String usuarioValido;
 
-    @Value("${app.security.senha}")
-    private String senhaValida;
+    @Value("${app.security.senha-hash}")
+    private String senhaHash;
+
+    private final JwtUtil jwtUtil;
+
+    public AuthController(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest login, HttpServletRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest login) {
 
-        boolean credenciaisCorretas =
-                usuarioValido.equals(login.usuario()) && senhaValida.equals(login.senha());
+        boolean usuarioCorreto = usuarioValido.equals(login.usuario());
+        boolean senhaCorreta = usuarioCorreto
+                && BCrypt.verifyer().verify(login.senha().toCharArray(), senhaHash).verified;
 
-        if (!credenciaisCorretas) {
+        if (!senhaCorreta) {
             return ResponseEntity.status(401).body(Map.of("mensagem", "Usuário ou senha inválidos"));
         }
 
-        HttpSession session = request.getSession(true);
-        session.setAttribute("autenticado", true);
+        String token = jwtUtil.gerarToken(login.usuario());
 
-        return ResponseEntity.ok(Map.of("mensagem", "Login realizado com sucesso"));
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
-        return ResponseEntity.ok(Map.of("mensagem", "Logout realizado"));
+        return ResponseEntity.ok(Map.of("token", token));
     }
 
     @GetMapping("/status")
-    public ResponseEntity<?> status(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        boolean autenticado = session != null && Boolean.TRUE.equals(session.getAttribute("autenticado"));
+    public ResponseEntity<?> status(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        boolean autenticado = authHeader != null
+                && authHeader.startsWith("Bearer ")
+                && jwtUtil.tokenValido(authHeader.substring(7));
+
         return ResponseEntity.ok(Map.of("autenticado", autenticado));
     }
 }

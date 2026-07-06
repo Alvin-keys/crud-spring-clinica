@@ -1,5 +1,6 @@
 package com.clinica.api.config;
 
+import com.clinica.api.security.JwtUtil;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -7,9 +8,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+    private final JwtUtil jwtUtil;
+
+    public WebConfig(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AuthInterceptor())
+        registry.addInterceptor(new AuthInterceptor(jwtUtil))
                 .addPathPatterns("/pacientes", "/pacientes/**", "/consultas", "/consultas/**");
     }
 }
