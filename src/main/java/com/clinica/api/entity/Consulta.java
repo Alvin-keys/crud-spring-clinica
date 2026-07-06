@@ -16,11 +16,11 @@ public class Consulta {
 
     private LocalDate dataConsulta;
 
+    @Column(columnDefinition = "TEXT")
     private String observacoes;
 
     @ManyToOne
     @JoinColumn(name = "paciente_id")
     private Paciente paciente;
-
 
 }

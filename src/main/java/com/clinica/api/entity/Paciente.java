@@ -23,9 +23,16 @@ public class Paciente {
     private LocalDate dataPrimeiraConsulta;
 
     private Integer idade;
+
+    @Column(columnDefinition = "TEXT")
     private String queixaPrincipal;
+
+    @Column(columnDefinition = "TEXT")
     private String composicaoFamiliar;
+
+    @Column(columnDefinition = "TEXT")
     private String rotina;
+
     private String contatoEmergencia;
     private String diasAtendimento;
     private String horarioAtendimento;
